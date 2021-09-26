@@ -1,25 +1,21 @@
 <template>
   <div>
     <video autoplay ref="localVideo"></video>
-    <ringo-controls @onstart="onStart" @call="onCallStart" @hang="onCallEnd" />
+    <ringo-controls @call="onCallStart" @hang="onCallEnd" />
   </div>
 </template>
 
 <script>
 import connection from "../helper/connection";
-import RingoControls from "@components/RingoControls.vue";
+import RingoControls from "./RingoControls.vue";
+import trace from "../utilities/debug";
 
 export default {
   name: "RingoCaller",
   components: { RingoControls },
   mounted() {
-    //   // Initializes media stream.
-    //   navigator.mediaDevices
-    //     .getUserMedia(this.mediaStreamConstraints)
-    //     .then(this.gotLocalMediaStream)
-    //     .catch(this.handleLocalMediaStreamError);
-
-    this.localConnection = connection();
+    this.connection = connection();
+    this.connection.startAction();
   },
   data() {
     return {
@@ -39,14 +35,6 @@ export default {
     handleLocalMediaStreamError(error) {
       trace(`navigator.getUserMedia error: ${error.toString()}.`);
     },
-    // Handles start button action: creates local MediaStream.
-    onStart() {
-      navigator.mediaDevices
-        .getUserMedia(this.mediaStreamConstraints)
-        .then(this.gotLocalMediaStream)
-        .catch(this.handleLocalMediaStreamError);
-      trace("Requesting local stream.");
-    },
     onCallStart() {
       trace("Starting call.");
       this.startTime = window.performance.now();
@@ -64,10 +52,11 @@ export default {
       // Create peer connections and add behavior.
       this.localPeerConnection = connection();
     },
-    onCallRecieve(stream){
+    onCallEnd() {},
+    onCallRecieve(stream) {
       this.gotLocalMediaStream(stream);
-      trace('Remote peer connection received remote stream.');
-    }
+      trace("Remote peer connection received remote stream.");
+    },
   },
 };
 </script>

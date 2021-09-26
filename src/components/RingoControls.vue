@@ -1,13 +1,10 @@
 <template>
   <div>
-    <button type="button" @click="onStart" :disabled="startDisable">
-      $translation.start
-    </button>
     <button type="button" @click="onCallStart" :disabled="callDisable">
-      $translation.call
+      $translation.controls.call
     </button>
     <button type="button" @click="onCallEnd" :disabled="hangDisable">
-      $translation.hang
+      $translation.controls.hang
     </button>
   </div>
 </template>
@@ -17,18 +14,11 @@ export default {
   name: "RingoControls",
   data() {
     return {
-      startDisable: false,
-      callDisable: true,
+      callDisable: false,
       hangDisable: true,
     };
   },
   methods: {
-    onStart() {
-      this.startDisable = true;
-      this.callDisable = false;
-      this.hangDisable = true;
-      this.$emit("onstart");
-    },
     onCallStart() {
       this.callDisable = true;
       this.hangDisable = false;
