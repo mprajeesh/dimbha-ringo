@@ -1,58 +1,42 @@
 <template>
   <div>
-    <video autoplay ref="localVideo"></video>
+    <video class="video-local" autoplay ref="localVideo"></video>
+    <video autoplay="video-remote" ref="remoteVideo"></video>
     <ringo-controls @call="onCallStart" @hang="onCallEnd" />
   </div>
 </template>
 
 <script>
-import connection from "../helper/connection";
 import RingoControls from "./RingoControls.vue";
 import trace from "../utilities/debug";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "RingoCaller",
   components: { RingoControls },
   mounted() {
-    this.connection = connection();
-    this.connection.startAction();
+    this.startAction();
   },
-  data() {
-    return {
-      mediaStreamConstraints: { video: true, audio: false },
-      localStream: null,
-      localConnection: null,
-      startTime: null,
-    };
+  computed: {
+    ...mapGetters("caller", ["getLocalStream", "getRemoteStream"]),
+  },
+  watch: {
+    getLocalStream(stream) {
+      this.$refs.localVideo.srcObject = stream;
+    },
+    getRemoteStream(stream) {
+      this.$refs.remoteVideo.srcObject = stream;
+    },
   },
   methods: {
-    // Sets the MediaStream as the video element src.
-    gotLocalMediaStream(mediaStream) {
-      this.localStream = mediaStream;
-      this.$refs.localVideo.srcObject = mediaStream;
-    },
-    // Handles error by logging a message to the console with the error message.
-    handleLocalMediaStreamError(error) {
-      trace(`navigator.getUserMedia error: ${error.toString()}.`);
-    },
+    ...mapActions("caller", ["startAction", "callStart", "callEnd"]),
     onCallStart() {
       trace("Starting call.");
-      this.startTime = window.performance.now();
-
-      // Get local media stream tracks.
-      const videoTracks = this.localStream.getVideoTracks();
-      const audioTracks = this.localStream.getAudioTracks();
-      if (videoTracks.length > 0) {
-        trace(`Using video device: ${videoTracks[0].label}.`);
-      }
-      if (audioTracks.length > 0) {
-        trace(`Using audio device: ${audioTracks[0].label}.`);
-      }
-
-      // Create peer connections and add behavior.
-      this.localPeerConnection = connection();
+      this.callStart();
     },
-    onCallEnd() {},
+    onCallEnd() {
+      this.callEnd();
+    },
     onCallRecieve(stream) {
       this.gotLocalMediaStream(stream);
       trace("Remote peer connection received remote stream.");
@@ -63,8 +47,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-video {
-  max-width: 100%;
-  min-width: 320px;
+.video-local,
+.video-remote {
+  width: 45%;
 }
 </style>
