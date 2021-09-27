@@ -30,9 +30,9 @@ export default {
   },
   methods: {
     ...mapActions("caller", ["startAction", "callStart", "callEnd"]),
-    onCallStart() {
+    async onCallStart() {
       trace("Starting call.");
-      this.callStart();
+      await this.callStart();
     },
     onCallEnd() {
       this.callEnd();

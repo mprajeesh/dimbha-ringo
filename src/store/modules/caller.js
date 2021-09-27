@@ -22,19 +22,6 @@ export default {
   },
   //getters
   getters: {
-    // Gets the "other" peer connection.
-    getOtherPeer(state, peerConnection) {
-      return peerConnection === state.localPeerConnection
-        ? state.remotePeerConnection
-        : state.localPeerConnection;
-    },
-
-    // Gets the name of a certain peer connection.
-    getPeerName(state, peerConnection) {
-      return peerConnection === state.localPeerConnection
-        ? "localPeerConnection"
-        : "remotePeerConnection";
-    },
     getLocalStream(state) {
       return state.localStream;
     },
@@ -79,12 +66,12 @@ export default {
 
     // Logs success when localDescription is set.
     setLocalDescriptionSuccess(state, peerConnection) {
-      setDescriptionSuccess(peerConnection, "setLocalDescription");
+      setDescriptionSuccess(state, peerConnection, "setLocalDescription");
     },
 
     // Logs success when remoteDescription is set.
     setRemoteDescriptionSuccess(state, peerConnection) {
-      setDescriptionSuccess(peerConnection, "setRemoteDescription");
+      setDescriptionSuccess(state, peerConnection, "setRemoteDescription");
     },
   },
   //actions
@@ -104,10 +91,11 @@ export default {
           handleConnectionSuccess(peerConnection);
         } catch (error) {
           handleConnectionFailure(peerConnection, error);
+          throw error;
         }
 
         trace(
-          `${getPeerName(peerConnection)} ICE candidate:\n` +
+          `${getPeerName(state, peerConnection)} ICE candidate:\n` +
             `${event.candidate.candidate}.`
         );
       }
@@ -123,22 +111,28 @@ export default {
         commit("setLocalDescriptionSuccess", state.localPeerConnection);
       } catch (error) {
         commit("setSessionDescriptionError", error);
+        throw error;
       }
 
       trace("remotePeerConnection setRemoteDescription start.");
       try {
         await state.remotePeerConnection.setRemoteDescription(description);
+        console.log("**********************", state.remotePeerConnection);
         commit("setRemoteDescriptionSuccess", state.remotePeerConnection);
       } catch (error) {
         commit("setSessionDescriptionError", error);
+        throw error;
       }
 
       trace("remotePeerConnection createAnswer start.");
       try {
-        await state.remotePeerConnection.createAnswer(description);
-        dispatch("createdAnswer", description);
+        let remoteDescription = await state.remotePeerConnection.createAnswer(
+          description
+        );
+        await dispatch("createdAnswer", remoteDescription);
       } catch (error) {
         commit("setSessionDescriptionError", error);
+        throw error;
       }
     },
 
@@ -152,6 +146,7 @@ export default {
         commit("setLocalDescriptionSuccess", state.remotePeerConnection);
       } catch (error) {
         commit("setSessionDescriptionError", error);
+        throw error;
       }
 
       trace("localPeerConnection setRemoteDescription start.");
@@ -160,6 +155,7 @@ export default {
         commit("setRemoteDescriptionSuccess", state.localPeerConnection);
       } catch (error) {
         commit("setSessionDescriptionError", error);
+        throw error;
       }
     },
 
@@ -173,6 +169,7 @@ export default {
         commit("gotLocalMediaStream", mediaStream);
       } catch (error) {
         commit("handleLocalMediaStreamError", error);
+        throw error;
       }
       trace("Requesting local stream.");
     },
@@ -193,7 +190,7 @@ export default {
       state.localPeerConnection.addEventListener(
         "iceconnectionstatechange",
         (event) => {
-          dispatch("handleConnectionChange", event);
+          commit("handleConnectionChange", event);
         }
       );
 
@@ -206,7 +203,7 @@ export default {
       state.remotePeerConnection.addEventListener(
         "iceconnectionstatechange",
         (event) => {
-          dispatch("handleConnectionChange", event);
+          commit("handleConnectionChange", event);
         }
       );
       state.remotePeerConnection.addEventListener("addstream", (event) => {
@@ -222,9 +219,10 @@ export default {
         let description = await state.localPeerConnection.createOffer(
           state.offerOptions
         );
-        dispatch("createdOffer", description);
+        await dispatch("createdOffer", description);
       } catch (error) {
         commit("setSessionDescriptionError", error);
+        throw error;
       }
     },
 
@@ -298,13 +296,13 @@ function logVideoLoaded(state, event) {
 
 // Logs that the connection succeeded.
 function handleConnectionSuccess(state, peerConnection) {
-  trace(`${getPeerName(peerConnection)} addIceCandidate success.`);
+  trace(`${getPeerName(state, peerConnection)} addIceCandidate success.`);
 }
 
 // Logs that the connection failed.
 function handleConnectionFailure(state, peerConnection, error) {
   trace(
-    `${getPeerName(peerConnection)} failed to add ICE Candidate:\n` +
+    `${getPeerName(state, peerConnection)} failed to add ICE Candidate:\n` +
       `${error?.toString()}.`
   );
 }

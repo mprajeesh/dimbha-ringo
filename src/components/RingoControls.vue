@@ -19,15 +19,15 @@ export default {
     };
   },
   methods: {
-    onCallStart() {
+    async onCallStart() {
       this.callDisable = true;
       this.hangDisable = false;
-      this.$emit("call");
+      await this.$emit("call");
     },
-    onCallEnd() {
+    async onCallEnd() {
       this.callDisable = false;
       this.hangDisable = true;
-      this.$emit("hang");
+      await this.$emit("hang");
     },
   },
 };
