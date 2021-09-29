@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="caller">
     <video class="video-local" autoplay ref="localVideo"></video>
     <video autoplay="video-remote" ref="remoteVideo"></video>
     <ringo-controls @call="onCallStart" @hang="onCallEnd" />
@@ -50,5 +50,11 @@ export default {
 .video-local,
 .video-remote {
   width: 45%;
+  border-radius: spacing(1);
+}
+
+.caller {
+  width: 100%;
+  height: 100%;
 }
 </style>

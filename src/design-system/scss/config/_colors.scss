@@ -1,0 +1,55 @@
+$color--white: #fff;
+$color--black: #000;
+
+$color--red: #d62d23;
+$color--orange: #ff9b1e;
+$color--green: #5bdaa5;
+$color--blue: #00b5ef;
+$color--teal: #00786b;
+$color--navy: #00243d;
+
+$color--danger: $color--red;
+$color--warning: $color--orange;
+$color--success: $color--green;
+$color--info: $color--blue;
+
+$background-color--primary: $color--teal;
+
+$color--std-grey: (
+  "900": darken($color--white, 90),
+  "800": darken($color--white, 80),
+  "700": darken($color--white, 70),
+  "600": darken($color--white, 60),
+  "500": darken($color--white, 50),
+  "400": darken($color--white, 40),
+  "300": darken($color--white, 30),
+  "200": darken($color--white, 20),
+  "100": darken($color--white, 10),
+  "50": darken($color--white, 5),
+);
+
+$color--std-navy: (
+  "900": darken($color--navy, 90),
+  "800": darken($color--navy, 80),
+  "700": darken($color--navy, 70),
+  "600": darken($color--navy, 60),
+  "500": darken($color--navy, 50),
+  "400": darken($color--navy, 40),
+  "300": darken($color--navy, 30),
+  "200": darken($color--navy, 20),
+  "100": darken($color--navy, 10),
+  "50": darken($color--navy, 5),
+);
+
+$color--std-teal: (
+  "900": darken($color--teal, 90),
+  "800": darken($color--teal, 80),
+  "700": darken($color--teal, 70),
+  "600": darken($color--teal, 60),
+  "500": darken($color--teal, 50),
+  "400": darken($color--teal, 40),
+  "300": darken($color--teal, 30),
+  "200": darken($color--teal, 20),
+  "100": darken($color--teal, 10),
+  "50": darken($color--teal, 5),
+);

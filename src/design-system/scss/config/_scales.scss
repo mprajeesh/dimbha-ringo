@@ -1,0 +1,7 @@
+@function breakpoint($scale, $offset:0) {
+    @return ($scale*100) + $offset;
+}
+
+@function spacing($scale){
+    @return($scale * 4px)
+}
